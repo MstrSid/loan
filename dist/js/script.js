@@ -96,11 +96,75 @@
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _modules_slider__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./modules/slider */ "./src/js/modules/slider.js");
+/* harmony import */ var _modules_playVideo__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./modules/playVideo */ "./src/js/modules/playVideo.js");
+
 
 window.addEventListener('DOMContentLoaded', () => {
   const slider = new _modules_slider__WEBPACK_IMPORTED_MODULE_0__["default"]('.page', '.next');
+  const videoPlayer = new _modules_playVideo__WEBPACK_IMPORTED_MODULE_1__["default"]('.showup .play', '.overlay');
   slider.render();
+  videoPlayer.init();
 });
+
+/***/ }),
+
+/***/ "./src/js/modules/playVideo.js":
+/*!*************************************!*\
+  !*** ./src/js/modules/playVideo.js ***!
+  \*************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return VideoPlayer; });
+class VideoPlayer {
+  constructor(triggers, popup) {
+    this.buttons = document.querySelectorAll(triggers);
+    this.popup = document.querySelector(popup);
+    this.close = this.popup.querySelector('.close');
+  }
+
+  createPlayer(url) {
+    this.player = new YT.Player('frame', {
+      height: '100%',
+      width: '100%',
+      videoId: url
+    });
+    this.popup.style.display = 'flex';
+  }
+
+  bindTriggers() {
+    this.buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.createPlayer(btn.getAttribute('data-url'));
+      });
+    });
+  }
+
+  bindClose() {
+    this.close.addEventListener('click', () => {
+      this.popup.style.display = 'none';
+
+      try {
+        this.player.stopVideo();
+        this.player.destroy();
+      } catch (e) {
+        console.error(e);
+      }
+    });
+  }
+
+  init() {
+    const tag = document.createElement('script');
+    tag.src = "http://www.youtube.com/iframe_api";
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    this.bindTriggers();
+    this.bindClose();
+  }
+
+}
 
 /***/ }),
 
