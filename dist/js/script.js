@@ -96,16 +96,42 @@
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _modules_slider_slider_main__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./modules/slider/slider-main */ "./src/js/modules/slider/slider-main.js");
-/* harmony import */ var _modules_playVideo__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./modules/playVideo */ "./src/js/modules/playVideo.js");
+/* harmony import */ var _modules_slider_slider_mini__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./modules/slider/slider-mini */ "./src/js/modules/slider/slider-mini.js");
+/* harmony import */ var _modules_playVideo__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./modules/playVideo */ "./src/js/modules/playVideo.js");
+
 
 
 window.addEventListener('DOMContentLoaded', () => {
-  const slider = new _modules_slider_slider_main__WEBPACK_IMPORTED_MODULE_0__["default"]({
-    slider: '.page',
+  const sliderMain = new _modules_slider_slider_main__WEBPACK_IMPORTED_MODULE_0__["default"]({
+    container: '.page',
     buttons: '.next'
   });
-  const videoPlayer = new _modules_playVideo__WEBPACK_IMPORTED_MODULE_1__["default"]('.showup .play', '.overlay');
-  slider.render();
+  const videoPlayer = new _modules_playVideo__WEBPACK_IMPORTED_MODULE_2__["default"]('.showup .play', '.overlay');
+  const showUpSlider = new _modules_slider_slider_mini__WEBPACK_IMPORTED_MODULE_1__["default"]({
+    container: '.showup__content-slider',
+    prev: '.showup__prev',
+    next: '.showup__next',
+    activeClass: 'card-active',
+    animate: true
+  });
+  const modulesSlider = new _modules_slider_slider_mini__WEBPACK_IMPORTED_MODULE_1__["default"]({
+    container: '.modules__content-slider',
+    prev: '.modules__info-btns .slick-prev',
+    next: '.modules__info-btns .slick-next',
+    activeClass: 'card-active',
+    animate: true,
+    autoplay: true
+  });
+  const feedSlider = new _modules_slider_slider_mini__WEBPACK_IMPORTED_MODULE_1__["default"]({
+    container: '.feed__slider',
+    prev: '.feed__slider .slick-prev',
+    next: '.feed__slider .slick-next',
+    activeClass: 'feed__item-active'
+  });
+  showUpSlider.init();
+  modulesSlider.init();
+  feedSlider.init();
+  sliderMain.render();
   videoPlayer.init();
 });
 
@@ -184,8 +210,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _slider__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./slider */ "./src/js/modules/slider/slider.js");
 
 class MainSlider extends _slider__WEBPACK_IMPORTED_MODULE_0__["default"] {
-  constructor(page, buttons) {
-    super(page, buttons);
+  constructor(prefs) {
+    super(prefs);
   }
 
   showSlides(n) {
@@ -215,7 +241,7 @@ class MainSlider extends _slider__WEBPACK_IMPORTED_MODULE_0__["default"] {
       console.error(e);
     }
 
-    this.slides.forEach(slide => {
+    [...this.slides].forEach(slide => {
       slide.style.display = 'none';
 
       if (slide.classList.contains('animated')) {
@@ -258,6 +284,97 @@ class MainSlider extends _slider__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
 /***/ }),
 
+/***/ "./src/js/modules/slider/slider-mini.js":
+/*!**********************************************!*\
+  !*** ./src/js/modules/slider/slider-mini.js ***!
+  \**********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return MiniSlider; });
+/* harmony import */ var _slider__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./slider */ "./src/js/modules/slider/slider.js");
+
+class MiniSlider extends _slider__WEBPACK_IMPORTED_MODULE_0__["default"] {
+  constructor(prefs) {
+    super(prefs);
+  }
+
+  bindTriggers() {
+    this.next.addEventListener('click', () => {
+      this.nextSlide();
+      console.log(this.slides);
+    });
+    this.prev.addEventListener('click', () => {
+      this.prevSlide();
+      console.log(this.slides);
+    });
+  }
+
+  excludeButtons() {
+    [...this.slides].forEach(item => {
+      if (item.tagName.toLowerCase() === 'button') {
+        this.container.appendChild(item);
+      }
+    });
+  }
+
+  nextSlide() {
+    this.container.appendChild(this.slides[0]);
+    this.excludeButtons();
+    this.decorSlides();
+  }
+
+  prevSlide() {
+    this.excludeButtons();
+    let active = this.slides[this.slides.length - 3];
+    this.container.insertBefore(active, this.slides[0]);
+    this.decorSlides();
+  }
+
+  decorSlides() {
+    [...this.slides].forEach(slide => {
+      try {
+        slide.classList.remove(this.activeClass);
+
+        if (this.animate) {
+          slide.querySelector('.card__title').style.opacity = '0.4';
+          slide.querySelector('.card__controls-arrow').style.opacity = '0';
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    });
+    this.slides[0].classList.add(this.activeClass);
+
+    if (this.animate) {
+      this.slides[0].querySelector('.card__title').style.opacity = '1';
+      this.slides[0].querySelector('.card__controls-arrow').style.opacity = '1';
+    }
+  }
+
+  init() {
+    this.container.style.cssText = `
+			display: flex;
+			flex-wrap: wrap;
+			overflow: hidden;
+			align-items: flex-start;
+		`;
+    this.bindTriggers();
+    this.decorSlides();
+
+    if (this.autoplay) {
+      setInterval(() => {
+        this.nextSlide();
+      }, 5000);
+    }
+  }
+
+}
+
+/***/ }),
+
 /***/ "./src/js/modules/slider/slider.js":
 /*!*****************************************!*\
   !*** ./src/js/modules/slider/slider.js ***!
@@ -271,14 +388,22 @@ __webpack_require__.r(__webpack_exports__);
 class Slider {
   constructor() {
     let {
-      slider = "",
-      buttons = "",
-      next = "",
-      prev = ""
+      container = null,
+      buttons = null,
+      next = null,
+      prev = null,
+      activeClass = '',
+      animate = false,
+      autoplay = false
     } = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    this.slider = document.querySelector(slider);
-    this.slides = [...this.slider.children];
+    this.container = document.querySelector(container);
+    this.slides = this.container.children;
     this.buttons = document.querySelectorAll(buttons);
+    this.next = document.querySelector(next);
+    this.prev = document.querySelector(prev);
+    this.activeClass = activeClass;
+    this.animate = animate;
+    this.autoplay = autoplay;
     this.slideIndex = 0;
   }
 

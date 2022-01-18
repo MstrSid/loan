@@ -1,8 +1,8 @@
 import Slider from "./slider";
 
 export default class MainSlider extends Slider {
-	constructor(page, buttons){
-		super(page, buttons);
+	constructor(prefs) {
+		super(prefs);
 	}
 
 	showSlides(n) {
@@ -32,7 +32,7 @@ export default class MainSlider extends Slider {
 		}
 
 
-		this.slides.forEach(slide => {
+		[...this.slides].forEach(slide => {
 			slide.style.display = 'none';
 			if (slide.classList.contains('animated')) {
 				slide.classList.remove('animated');
