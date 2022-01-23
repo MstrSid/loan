@@ -350,30 +350,64 @@ class VideoPlayer {
     this.buttons = document.querySelectorAll(triggers);
     this.popup = document.querySelector(popup);
     this.close = this.popup.querySelector('.close');
+    this.onPlayerStateChange = this.onPlayerStateChange.bind(this);
   }
 
   createPlayer(url) {
     this.player = new YT.Player('frame', {
       height: '100%',
       width: '100%',
-      videoId: url
+      videoId: url,
+      events: {
+        'onStateChange': this.onPlayerStateChange
+      }
     });
     this.popup.style.display = 'flex';
   }
 
+  onPlayerStateChange(state) {
+    try {
+      const blockedElem = this.activeBtn.closest('.module__video-item').nextElementSibling;
+      const playBtn = this.activeBtn.querySelector('svg').cloneNode(true);
+
+      if (state.data === 0 && blockedElem.querySelector('.play__circle').classList.contains('closed')) {
+        blockedElem.querySelector('.play__circle').classList.remove('closed');
+        blockedElem.querySelector('svg').remove();
+        blockedElem.querySelector('.play__circle').appendChild(playBtn);
+        blockedElem.querySelector('.play__text').textContent = 'play video';
+        blockedElem.querySelector('.play__text').classList.remove('attention');
+        blockedElem.style.opacity = 1;
+        blockedElem.style.filter = 'none';
+        blockedElem.setAttribute('data-disabled', 'false');
+      }
+    } catch (e) {}
+  }
+
   bindTriggers() {
-    this.buttons.forEach(btn => {
+    this.buttons.forEach((btn, i) => {
+      try {
+        const blockedElem = btn.closest('.module__video-item').nextElementSibling;
+
+        if (i % 2 == 0) {
+          blockedElem.setAttribute('data-disabled', 'true');
+        }
+      } catch (e) {}
+
       btn.addEventListener('click', () => {
-        if (document.querySelector('iframe#frame')) {
-          if (this.videoId !== btn.getAttribute('data-url')) {
+        if (!btn.closest('.module__video-item') || btn.closest('.module__video-item').getAttribute('data-disabled') !== 'true') {
+          this.activeBtn = btn;
+
+          if (document.querySelector('iframe#frame')) {
+            if (this.videoId !== btn.getAttribute('data-url')) {
+              this.videoId = btn.getAttribute('data-url');
+              this.player.loadVideoById({
+                videoId: this.videoId
+              });
+            }
+          } else {
             this.videoId = btn.getAttribute('data-url');
-            this.player.loadVideoById({
-              videoId: this.videoId
-            });
+            this.createPlayer(this.videoId);
           }
-        } else {
-          this.videoId = btn.getAttribute('data-url');
-          this.createPlayer(this.videoId);
         }
       });
     });
