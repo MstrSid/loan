@@ -299,16 +299,15 @@ __webpack_require__.r(__webpack_exports__);
 class MiniSlider extends _slider__WEBPACK_IMPORTED_MODULE_0__["default"] {
   constructor(prefs) {
     super(prefs);
+    this.hasButtonsInside = false;
   }
 
   bindTriggers() {
     this.next.addEventListener('click', () => {
       this.nextSlide();
-      console.log(this.slides);
     });
     this.prev.addEventListener('click', () => {
       this.prevSlide();
-      console.log(this.slides);
     });
   }
 
@@ -316,6 +315,7 @@ class MiniSlider extends _slider__WEBPACK_IMPORTED_MODULE_0__["default"] {
     [...this.slides].forEach(item => {
       if (item.tagName.toLowerCase() === 'button') {
         this.container.appendChild(item);
+        this.hasButtonsInside = true;
       }
     });
   }
@@ -328,7 +328,14 @@ class MiniSlider extends _slider__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
   prevSlide() {
     this.excludeButtons();
-    let active = this.slides[this.slides.length - 3];
+    let active;
+
+    if (this.hasButtonsInside) {
+      active = this.slides[this.slides.length - 3];
+    } else {
+      active = this.slides[this.slides.length - 1];
+    }
+
     this.container.insertBefore(active, this.slides[0]);
     this.decorSlides();
   }
@@ -354,6 +361,52 @@ class MiniSlider extends _slider__WEBPACK_IMPORTED_MODULE_0__["default"] {
     }
   }
 
+  goAutoplay() {
+    let startAutoplay = setInterval(() => this.nextSlide(), 5000);
+    this.container.addEventListener('mouseenter', () => {
+      try {
+        clearInterval(startAutoplay);
+      } catch (e) {
+        console.error(e);
+      }
+    });
+    this.prev.addEventListener('mouseenter', () => {
+      try {
+        clearInterval(startAutoplay);
+      } catch (e) {
+        console.error(e);
+      }
+    });
+    this.next.addEventListener('mouseenter', () => {
+      try {
+        clearInterval(startAutoplay);
+      } catch (e) {
+        console.error(e);
+      }
+    });
+    this.container.addEventListener('mouseleave', () => {
+      try {
+        startAutoplay = setInterval(() => this.nextSlide(), 5000);
+      } catch (e) {
+        console.error(e);
+      }
+    });
+    this.prev.addEventListener('mouseleave', () => {
+      try {
+        startAutoplay = setInterval(() => this.nextSlide(), 5000);
+      } catch (e) {
+        console.error(e);
+      }
+    });
+    this.next.addEventListener('mouseleave', () => {
+      try {
+        startAutoplay = setInterval(() => this.nextSlide(), 5000);
+      } catch (e) {
+        console.error(e);
+      }
+    });
+  }
+
   init() {
     this.container.style.cssText = `
 			display: flex;
@@ -363,12 +416,9 @@ class MiniSlider extends _slider__WEBPACK_IMPORTED_MODULE_0__["default"] {
 		`;
     this.bindTriggers();
     this.decorSlides();
-
-    if (this.autoplay) {
-      setInterval(() => {
-        this.nextSlide();
-      }, 5000);
-    }
+    /*if (this.autoplay) {
+    	this.goAutoplay();
+    }*/
   }
 
 }
