@@ -3,6 +3,8 @@ import MiniSlider from './modules/slider/slider-mini';
 import VideoPlayer from './modules/playVideo';
 import Difference from './modules/difference';
 import Form from './modules/form';
+import ShowInfo from './modules/showInfo';
+import Download from './modules/download';
 
 window.addEventListener('DOMContentLoaded', () => {
 	new MainSlider({
@@ -49,5 +51,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
 	new Form('#b__form', 'assets/question.php').init();
 	new Form('#s__form', 'assets/question.php').init();
+
+	new ShowInfo('.module__info-show', '.plus').init();
+
+	new Download('.download', 'assets/img/mainbg.jpg').init();
 
 });

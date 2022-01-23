@@ -100,6 +100,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _modules_playVideo__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./modules/playVideo */ "./src/js/modules/playVideo.js");
 /* harmony import */ var _modules_difference__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./modules/difference */ "./src/js/modules/difference.js");
 /* harmony import */ var _modules_form__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./modules/form */ "./src/js/modules/form.js");
+/* harmony import */ var _modules_showInfo__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./modules/showInfo */ "./src/js/modules/showInfo.js");
+/* harmony import */ var _modules_download__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./modules/download */ "./src/js/modules/download.js");
+
+
 
 
 
@@ -143,6 +147,8 @@ window.addEventListener('DOMContentLoaded', () => {
   new _modules_difference__WEBPACK_IMPORTED_MODULE_3__["default"]('.officernew', '.plus', '.officer__card-item').init();
   new _modules_form__WEBPACK_IMPORTED_MODULE_4__["default"]('#b__form', 'assets/question.php').init();
   new _modules_form__WEBPACK_IMPORTED_MODULE_4__["default"]('#s__form', 'assets/question.php').init();
+  new _modules_showInfo__WEBPACK_IMPORTED_MODULE_5__["default"]('.module__info-show', '.plus').init();
+  new _modules_download__WEBPACK_IMPORTED_MODULE_6__["default"]('.download', 'assets/img/mainbg.jpg').init();
 });
 
 /***/ }),
@@ -198,6 +204,49 @@ class Difference {
       this.hideItems(this.featureBlockItems);
       this.bindTriggers(this.showButton, this.counter, this.featureBlockItems);
     } catch (e) {}
+  }
+
+}
+
+/***/ }),
+
+/***/ "./src/js/modules/download.js":
+/*!************************************!*\
+  !*** ./src/js/modules/download.js ***!
+  \************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Download; });
+class Download {
+  constructor(triggers, path) {
+    this.btns = document.querySelectorAll(triggers);
+    this.path = path;
+  }
+
+  getFile(path) {
+    const link = document.createElement('a');
+    link.setAttribute('href', path);
+    link.setAttribute('download', 'file');
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  bindTriggers() {
+    this.btns.forEach(item => {
+      item.style.cursor = 'pointer';
+      item.addEventListener('click', () => {
+        this.getFile(this.path);
+      });
+    });
+  }
+
+  init() {
+    this.bindTriggers();
   }
 
 }
@@ -434,6 +483,44 @@ class VideoPlayer {
       this.bindTriggers();
       this.bindClose();
     }
+  }
+
+}
+
+/***/ }),
+
+/***/ "./src/js/modules/showInfo.js":
+/*!************************************!*\
+  !*** ./src/js/modules/showInfo.js ***!
+  \************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ShowInfo; });
+class ShowInfo {
+  constructor(containerSelector, showBtnSelector) {
+    this.container = document.querySelectorAll(containerSelector);
+    this.showBtn = showBtnSelector;
+  }
+
+  bindTriggers() {
+    this.container.forEach(item => {
+      item.querySelector(this.showBtn).addEventListener('click', () => {
+        if (item.nextElementSibling.style.display === 'block') {
+          item.nextElementSibling.style.display = 'none';
+          item.nextElementSibling.classList.remove('animated', 'fadeIn');
+        } else {
+          item.nextElementSibling.classList.add('animated', 'fadeIn');
+          item.nextElementSibling.style.display = 'block';
+        }
+      });
+    });
+  }
+
+  init() {
+    this.bindTriggers();
   }
 
 }
