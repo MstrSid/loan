@@ -1,9 +1,12 @@
 export default class Difference {
 	constructor(featSelector, showSelector, items) {
-		this.featureBlock = document.querySelector(featSelector);
-		this.showButton = this.featureBlock.querySelector(showSelector);
-		this.featureBlockItems = this.featureBlock.querySelectorAll(items);
-		this.counter = 0;
+		try {
+			this.featureBlock = document.querySelector(featSelector);
+			this.showButton = this.featureBlock.querySelector(showSelector);
+			this.featureBlockItems = this.featureBlock.querySelectorAll(items);
+			this.counter = 0;
+		} catch (e) {}
+
 	}
 
 	hideItems(blockItems) {
@@ -33,7 +36,9 @@ export default class Difference {
 	}
 
 	init() {
-		this.hideItems(this.featureBlockItems);
-		this.bindTriggers(this.showButton, this.counter, this.featureBlockItems);
+		try {
+			this.hideItems(this.featureBlockItems);
+			this.bindTriggers(this.showButton, this.counter, this.featureBlockItems);
+		} catch (e) {}
 	}
 }

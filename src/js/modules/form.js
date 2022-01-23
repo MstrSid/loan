@@ -1,13 +1,16 @@
 export default class Form {
 	constructor(form, url) {
-		this.form = document.querySelector(form);
-		this.inputs = this.form.querySelectorAll('input');
-		this.message = {
-			loading: "Loading...",
-			success: "Thank you! We are connect with you soon!",
-			failure: "Oops, something went wrong...",
-		};
-		this.path = url;
+		try {
+			this.form = document.querySelector(form);
+			this.inputs = this.form.querySelectorAll('input');
+			this.message = {
+				loading: "Loading...",
+				success: "Thank you! We are connect with you soon!",
+				failure: "Oops, something went wrong...",
+			};
+			this.path = url;
+		} catch (e) {}
+
 	}
 
 	clearInputs(inputs) {
@@ -87,35 +90,37 @@ export default class Form {
 	}
 
 	init() {
-		this.checkMailInputs();
-		this.initMask();
-		this.form.addEventListener('submit', (e) => {
-			e.preventDefault();
+		try {
+			this.checkMailInputs();
+			this.initMask();
+			this.form.addEventListener('submit', (e) => {
+				e.preventDefault();
 
-			let statusMsg = document.createElement('div');
-			statusMsg.style.cssText = `
-				margin-top: 15px;
-				font-size: 18px;
-				color: grey;
-			`;
-			this.form.parentNode.appendChild(statusMsg);
+				let statusMsg = document.createElement('div');
+				statusMsg.style.cssText = `
+					margin-top: 15px;
+					font-size: 18px;
+					color: grey;
+				`;
+				this.form.parentNode.appendChild(statusMsg);
 
-			statusMsg.textContent = this.message.loading;
+				statusMsg.textContent = this.message.loading;
 
-			const formData = new FormData(this.form);
+				const formData = new FormData(this.form);
 
-			this.postData(this.path, formData)
-				.then(res => {
-					console.log(res);
-					statusMsg.textContent = this.message.success;
-				}).catch(() => {
-					statusMsg.textContent = this.message.failure;
-				}).finally(() => {
-					this.clearInputs(this.inputs);
-					setTimeout(() => {
-						statusMsg.remove();
-					}, 6000);
-				});
-		});
+				this.postData(this.path, formData)
+					.then(res => {
+						console.log(res);
+						statusMsg.textContent = this.message.success;
+					}).catch(() => {
+						statusMsg.textContent = this.message.failure;
+					}).finally(() => {
+						this.clearInputs(this.inputs);
+						setTimeout(() => {
+							statusMsg.remove();
+						}, 6000);
+					});
+			});
+		} catch (e) {}
 	}
 }
